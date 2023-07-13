@@ -1,24 +1,69 @@
-# README
+## Ebanx Take Home Assignment
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+--
+# Reset state before starting tests
 
-Things you may want to cover:
+POST /reset
 
-* Ruby version
+200 OK
 
-* System dependencies
 
-* Configuration
+--
+# Get balance for non-existing account
 
-* Database creation
+GET /balance?account_id=1234
 
-* Database initialization
+404 0
 
-* How to run the test suite
 
-* Services (job queues, cache servers, search engines, etc.)
+--
+# Create account with initial balance
 
-* Deployment instructions
+POST /event {"type":"deposit", "destination":"100", "amount":10}
 
-* ...
+201 {"destination": {"id":"100", "balance":10}}
+
+
+--
+# Deposit into existing account
+
+POST /event {"type":"deposit", "destination":"100", "amount":10}
+
+201 {"destination": {"id":"100", "balance":20}}
+
+
+--
+# Get balance for existing account
+
+GET /balance?account_id=100
+
+200 20
+
+--
+# Withdraw from non-existing account
+
+POST /event {"type":"withdraw", "origin":"200", "amount":10}
+
+404 0
+
+--
+# Withdraw from existing account
+
+POST /event {"type":"withdraw", "origin":"100", "amount":5}
+
+201 {"origin": {"id":"100", "balance":15}}
+
+--
+# Transfer from existing account
+
+POST /event {"type":"transfer", "origin":"100", "amount":15, "destination":"300"}
+
+201 {"origin": {"id":"100", "balance":0}, "destination": {"id":"300", "balance":15}}
+
+--
+# Transfer from non-existing account
+
+POST /event {"type":"transfer", "origin":"200", "amount":15, "destination":"300"}
+
+404 0
+
